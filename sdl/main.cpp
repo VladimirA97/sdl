@@ -17,16 +17,13 @@ int main(int argc, char* argv[])
 	SDL_CreateWindowAndRenderer(640, 480, SDL_WINDOW_RESIZABLE, &window, &renderer);
 
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
-	SDL_RenderClear(renderer);
-
+	
 	SDL_Rect r;
-	r.x = 125;
+	r.x = 215;
 	r.y = 125;
-	r.w = 380;
+	r.w = 220;
 	r.h = 220;
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
@@ -35,7 +32,6 @@ int main(int argc, char* argv[])
 
 	for (;;)
 	{
-
 	}
 
 	SDL_Quit();
