@@ -12,29 +12,27 @@ const int WINDOW_HEIGHT = 480;
 
 int main(int argc, char* argv[])
 {
+	int quit_game = 0;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer);
+	SDL_Surface* sprite = SDL_LoadBMP("lara.bmp");
+	SDL_Texture* texture_sprite = SDL_CreateTextureFromSurface(renderer, sprite);
+	//SDL_Surface* screen = SDL_GetWindowSurface(window);
+	SDL_Surface* background = SDL_LoadBMP("background.bmp");
+	SDL_Texture* texture_background = SDL_CreateTextureFromSurface(renderer, background);
 
-	SDL_Rect rectngl;
-	rectngl.x = 215;
-	rectngl.y = 125;
-	rectngl.w = 220;
-	rectngl.h = 220;
+	SDL_Rect rectangle;
+	rectangle.x = 215;
+	rectangle.y = 125;
+	rectangle.w = 220;
+	rectangle.h = 220;
 
-	for (;;)
+	while (!quit_game)
 	{
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		SDL_RenderClear(renderer);
-		//SDL_RenderPresent(renderer);
-
-		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-		SDL_RenderFillRect(renderer, &rectngl);
-		SDL_RenderPresent(renderer);
-
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
@@ -43,42 +41,49 @@ int main(int argc, char* argv[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_ESCAPE:
-					SDL_Quit();
+					quit_game = 1;
 					break;
 				case SDLK_LEFT:
-					rectngl.x -= 25;
+					rectangle.x -= 25;
 					break;
 				case SDLK_RIGHT:
-					rectngl.x += 25;
+					rectangle.x += 25;
 					break;
 				case SDLK_UP:
-					rectngl.y -= 25;
+					rectangle.y -= 25;
 					break;
 				case SDLK_DOWN:
-					rectngl.y += 25;
+					rectangle.y += 25;
 					break;
 				}
-				/*
-				if (rectngl.x == WINDOW_WIDTH)
+
+				if (rectangle.x < 0) 
 				{
-					rectngl.x -= 215;
+					rectangle.x = 0;
 				}
-				if (rectngl.x == 0)
+				else if (rectangle.x > WINDOW_WIDTH - rectangle.w) 
 				{
-					rectngl.x += 215;
+					rectangle.x = WINDOW_WIDTH - rectangle.w;
 				}
-				if (rectngl.y == WINDOW_HEIGHT)
+				if (rectangle.y < 0) 
 				{
-					rectngl.y -= 125;
+					rectangle.y = 0;
 				}
-				if (rectngl.y == 0)
+				else if (rectangle.y > WINDOW_HEIGHT - rectangle.h) 
 				{
-					rectngl.y += 125;
+					rectangle.y = WINDOW_HEIGHT - rectangle.h;
 				}
-				*/
 			}
 		}
+		//SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+		SDL_RenderClear(renderer);
+		//SDL_BlitSurface(image, NULL, screen, &rectngl);
+		SDL_RenderCopy(renderer, texture_background, NULL, NULL);
+		SDL_RenderCopy(renderer, texture_sprite, NULL, &rectangle);
+		SDL_RenderPresent(renderer);
 	}
+
+	SDL_Quit();
 
 	return(EXIT_SUCCESS);
 }
