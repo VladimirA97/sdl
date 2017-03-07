@@ -1,4 +1,5 @@
- #include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include "include/SDL.h"
 
@@ -24,13 +25,35 @@ int main(int argc, char* argv[])
 	//SDL_Surface* screen = SDL_GetWindowSurface(window);
 	SDL_Surface* background = SDL_LoadBMP("background.bmp");
 	SDL_Texture* texture_background = SDL_CreateTextureFromSurface(renderer, background);
+	//
+	SDL_Surface* bullet = SDL_LoadBMP("bullets.bmp");
+	SDL_Texture* texture_bullet = SDL_CreateTextureFromSurface(renderer, bullet);
 
 	SDL_Rect rectangle;
 	rectangle.x = 215;
 	rectangle.y = 125;
-	rectangle.w = 220;
-	rectangle.h = 220;
+	rectangle.w = 110;
+	rectangle.h = 110;
 
+	SDL_Rect bullet_rect[2];
+	for (int i = 0; i < 2; i++)
+	{
+		bullet_rect[i].x = rectangle.x;
+		bullet_rect[i].y = rectangle.y;
+		bullet_rect[i].w = 55;
+		bullet_rect[i].h = 55;
+	}
+	
+	struct keys
+	{
+		bool k_left = false;
+		bool k_right = false;
+		bool k_down = false;
+		bool k_up = false;
+	};
+	keys move;
+
+	bool bulled_is_pressed = false;
 	while (!quit_game)
 	{
 		SDL_Event event;
@@ -44,16 +67,21 @@ int main(int argc, char* argv[])
 					quit_game = 1;
 					break;
 				case SDLK_LEFT:
-					rectangle.x -= 25;
+					move.k_left = true;
 					break;
 				case SDLK_RIGHT:
-					rectangle.x += 25;
+					move.k_right = true;
 					break;
 				case SDLK_UP:
-					rectangle.y -= 25;
+					move.k_up = true;
 					break;
 				case SDLK_DOWN:
-					rectangle.y += 25;
+					move.k_down = true;
+					break;
+				case SDLK_SPACE:
+					bulled_is_pressed = true;
+					bullet_rect[0].x = rectangle.x;
+					bullet_rect[0].y = rectangle.y;
 					break;
 				}
 
@@ -75,15 +103,48 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
+		if (move.k_left == true)
+		{
+			rectangle.x -= 5;
+			move.k_left = false;
+		}
+		if (move.k_right == true)
+		{
+			rectangle.x += 5;
+			move.k_right = false;
+		}
+		if (move.k_down == true)
+		{
+			rectangle.y += 5;
+			move.k_down = false;
+		}
+		if (move.k_up == true)
+		{
+			rectangle.y -= 5;
+			move.k_up = false;			
+		}
+
+		if (bulled_is_pressed == true)
+		{
+			bullet_rect[0].x += 1;
+			if (bullet_rect[0].x == WINDOW_WIDTH)
+			{
+				bulled_is_pressed = false;
+			}
+		}
+
 		//SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
 		SDL_RenderClear(renderer);
 		//SDL_BlitSurface(image, NULL, screen, &rectngl);
 		SDL_RenderCopy(renderer, texture_background, NULL, NULL);
+		if (bulled_is_pressed == 1)
+		{
+			SDL_RenderCopy(renderer, texture_bullet, NULL, &bullet_rect[0]);
+		}
 		SDL_RenderCopy(renderer, texture_sprite, NULL, &rectangle);
 		SDL_RenderPresent(renderer);
 	}
 
 	SDL_Quit();
-
 	return(EXIT_SUCCESS);
 }
