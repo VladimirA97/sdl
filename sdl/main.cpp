@@ -3,6 +3,8 @@
 #include <iostream>
 #include "include/SDL.h"
 
+#define MAX_BULLETS 2
+
 using namespace std;
 
 #pragma comment(lib, "x86/SDL2.lib")
@@ -23,11 +25,13 @@ int main(int argc, char* argv[])
 	SDL_Surface* sprite = SDL_LoadBMP("lara.bmp");
 	SDL_Texture* texture_sprite = SDL_CreateTextureFromSurface(renderer, sprite);
 	//SDL_Surface* screen = SDL_GetWindowSurface(window);
-	SDL_Surface* background = SDL_LoadBMP("background.bmp");
-	SDL_Texture* texture_background = SDL_CreateTextureFromSurface(renderer, background);
-	//
+	//SDL_Surface* background = SDL_LoadBMP("background.bmp");
+	//SDL_Texture* texture_background = SDL_CreateTextureFromSurface(renderer, background);
 	SDL_Surface* bullet = SDL_LoadBMP("bullets.bmp");
 	SDL_Texture* texture_bullet = SDL_CreateTextureFromSurface(renderer, bullet);
+	//
+	SDL_Surface* scrolling_background = SDL_LoadBMP("scrolling_back.bmp");
+	SDL_Texture* texture_scrolling_back = SDL_CreateTextureFromSurface(renderer, scrolling_background);
 
 	SDL_Rect rectangle;
 	rectangle.x = 215;
@@ -35,8 +39,8 @@ int main(int argc, char* argv[])
 	rectangle.w = 110;
 	rectangle.h = 110;
 
-	SDL_Rect bullet_rect[2];
-	for (int i = 0; i < 2; i++)
+	SDL_Rect bullet_rect[MAX_BULLETS];
+	for (int i = 0; i < MAX_BULLETS; i++)
 	{
 		bullet_rect[i].x = rectangle.x;
 		bullet_rect[i].y = rectangle.y;
@@ -50,6 +54,11 @@ int main(int argc, char* argv[])
 		bool k_right = false;
 		bool k_down = false;
 		bool k_up = false;
+
+		bool k_d_l = false;
+		bool k_d_r = false;
+		bool k_u_l = false;
+		bool k_u_r = false;
 	};
 	keys move;
 
@@ -78,10 +87,27 @@ int main(int argc, char* argv[])
 				case SDLK_DOWN:
 					move.k_down = true;
 					break;
+					/*
+				case (SDLK_DOWN && SDLK_LEFT):
+					move.k_d_l = true;
+					break;
+				case (SDLK_DOWN && SDLK_RIGHT):
+					move.k_d_r = true;
+					break;
+				case SDLK_DOWN && SDLK_LEFT:
+					move.k_d_l = true;
+					break;
+				case SDLK_DOWN && SDLK_LEFT:
+					move.k_d_l = true;
+					break;
+					*/
 				case SDLK_SPACE:
 					bulled_is_pressed = true;
-					bullet_rect[0].x = rectangle.x;
-					bullet_rect[0].y = rectangle.y;
+					for (int i = 0; i < MAX_BULLETS; i++)
+					{
+						bullet_rect[i].x = rectangle.x;
+						bullet_rect[i].y = rectangle.y;
+					}
 					break;
 				}
 
@@ -126,20 +152,29 @@ int main(int argc, char* argv[])
 
 		if (bulled_is_pressed == true)
 		{
-			bullet_rect[0].x += 1;
-			if (bullet_rect[0].x == WINDOW_WIDTH)
+			for (int i = 0; i < MAX_BULLETS; i++)
 			{
-				bulled_is_pressed = false;
+				bullet_rect[i].x += 1;
+				if (bullet_rect[i].x == WINDOW_WIDTH)
+				{
+					bulled_is_pressed = false;
+				}
 			}
 		}
 
 		//SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
 		SDL_RenderClear(renderer);
 		//SDL_BlitSurface(image, NULL, screen, &rectngl);
-		SDL_RenderCopy(renderer, texture_background, NULL, NULL);
-		if (bulled_is_pressed == 1)
+		//SDL_RenderCopy(renderer, texture_background, NULL, NULL);
+
+		SDL_RenderCopy(renderer, texture_scrolling_back, NULL, NULL);
+
+		if (bulled_is_pressed == true)
 		{
-			SDL_RenderCopy(renderer, texture_bullet, NULL, &bullet_rect[0]);
+			for (int i = 0; i < MAX_BULLETS; i++)
+			{
+				SDL_RenderCopy(renderer, texture_bullet, NULL, &bullet_rect[i]);
+			}
 		}
 		SDL_RenderCopy(renderer, texture_sprite, NULL, &rectangle);
 		SDL_RenderPresent(renderer);
