@@ -2,13 +2,15 @@
 #include <stdlib.h>
 #include <iostream>
 #include "include/SDL.h"
+#include "include/SDL_image.h"
 
 #define MAX_BULLETS 10
 
-using namespace std;
-
 #pragma comment(lib, "x86/SDL2.lib")
 #pragma comment(lib, "x86/SDL2main.lib")
+#pragma comment(lib, "x86/SDL2_image.lib")
+
+using namespace std;
 
 const int WINDOW_WIDTH = 1080;
 const int WINDOW_HEIGHT = 720;
@@ -25,10 +27,10 @@ int main(int argc, char* argv[])
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	SDL_CreateWindowAndRenderer(WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer);
-	SDL_Surface* sprite = SDL_LoadBMP("lara.bmp");
+	SDL_Surface* sprite = IMG_Load("LARA + BULLET.png");
 	SDL_Texture* texture_sprite = SDL_CreateTextureFromSurface(renderer, sprite);
 	//
-	SDL_Surface* bullet = SDL_LoadBMP("bullets.bmp");
+	SDL_Surface* bullet = IMG_Load("bullets.png");
 	SDL_Texture* texture_bullet = SDL_CreateTextureFromSurface(renderer, bullet);
 	//
 	SDL_Surface* scrolling_background = SDL_LoadBMP("scrolling_back.bmp");
@@ -55,13 +57,20 @@ int main(int argc, char* argv[])
 	rectangle.w = 110;
 	rectangle.h = 110;
 
+	SDL_Rect cut_rectangle;
+	cut_rectangle.x = 75;
+	cut_rectangle.y = 50;
+	cut_rectangle.w = 500;
+	cut_rectangle.h = 500;
+
+
 	SDL_Rect bullet_rect[MAX_BULLETS];
 	for (int i = 0; i < MAX_BULLETS; i++)
 	{
 		bullet_rect[i].x = rectangle.x;
 		bullet_rect[i].y = rectangle.y;
-		bullet_rect[i].w = 55;
-		bullet_rect[i].h = 55;
+		bullet_rect[i].w = 35;
+		bullet_rect[i].h = 20;
 	}
 
 	struct keys
@@ -84,6 +93,7 @@ int main(int argc, char* argv[])
 		SDL_Event event;
 		while (SDL_PollEvent(&event))
 		{
+			//if (event.key.repeat == 0)
 			if (event.type == SDL_KEYDOWN)
 			{
 				switch (event.key.keysym.sym)
@@ -109,8 +119,8 @@ int main(int argc, char* argv[])
 						if (bulled_is_pressed[i] == false)
 						{
 							bulled_is_pressed[i] = true;
-							bullet_rect[i].x = rectangle.x;
-							bullet_rect[i].y = rectangle.y;
+							bullet_rect[i].x = rectangle.x + 75;
+							bullet_rect[i].y = rectangle.y + 15;
 							break;
 						}
 					}
@@ -186,13 +196,13 @@ int main(int argc, char* argv[])
 		{
 			if (bulled_is_pressed[i] == true)
 			{
-				SDL_RenderCopy(renderer, texture_bullet, NULL, &bullet_rect[i]);
+				SDL_RenderCopy(renderer, texture_bullet, &bullet_rect[i], &bullet_rect[i]);
 			}
 		}
 
-		SDL_RenderCopy(renderer, texture_sprite, NULL, &rectangle);
+		SDL_RenderCopy(renderer, texture_sprite, &cut_rectangle, &rectangle);
 		SDL_RenderPresent(renderer);
-
+		SDL_Delay(1);
 	}
 	SDL_Quit();
 	return(EXIT_SUCCESS);
